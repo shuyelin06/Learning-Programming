@@ -2,14 +2,14 @@
 #define UNICODE
 #endif
 
+// The window and tchar inclusions are necessary (windows for the application, tchar for the wchar_t datatype)
+#include <windows.h> 
+#include <tchar.h>
+
 /*
 The Win32 library is the native builder for Windows Applications. 
 Because of this, it is the fastest, though it can be hard to learn.
 */
-
-// The window and tchar inclusions are necessary (windows for the application, tchar for the wchar_t datatype)
-#include <windows.h> 
-#include <tchar.h>
 
 // WindowProc defines the behavior of the window (how it interacts with the user, appearance, etc)
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
