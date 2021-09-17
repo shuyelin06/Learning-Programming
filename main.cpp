@@ -1,44 +1,33 @@
-#ifndef UNICODE 
-#define UNICODE
-#endif
+#include "Windows.h" // Defines our windows
 
-// The window and tchar inclusions are necessary (windows for the application, tchar for the wchar_t datatype)
-#include <windows.h> 
-#include <tchar.h>
+/* 
+Notes to Run the Program
+https://stackoverflow.com/questions/61570603/can-not-compile-win32-c-using-mingw
+For some reason, PWSTR --> PSTR for the application to actually open. 
+  
+"cpp": "cd $dir && g++ $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+"cpp": "cd $dir && g++ *.cpp -o $fileNameWithoutExt && $dir$fileNameWithoutExt",  
+*/
 
 /*
 The Win32 library is the native builder for Windows Applications. 
 Because of this, it is the fastest, though it can be hard to learn.
-*/
 
-// WindowProc defines the behavior of the window (how it interacts with the user, appearance, etc)
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-/*
 WinMain is the entry-point function (where the script will begin running from). The parameters will be explained below:
     hInstance: Used to identify the .exe file where the window is being run from
     hPrevInstance: Discontinued; has no meaning.
     
 */
-// https://stackoverflow.com/questions/61570603/can-not-compile-win32-c-using-mingw
-// For some reason, PWSTR --> PSTR for the application to actually open.
+
+// Main function where the program will be run from
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, int nCmdShow){
-    const wchar_t Test_Window[] = L"Application Window"; // Regitering a window class
+    InstantiateMainWindow(hInstance);
 
-    WNDCLASS wc = {};
-
-    wc.lpfnWndProc = WindowProc;
-    wc.hInstance = hInstance;
-    wc.lpszClassName = Test_Window; // Is the wchar_t variable we previously defined
-
-    // This method registers the class, and we register it from its memory address (& operator)
-    RegisterClass(&wc);
-
-    // Creating a window
+    // Creates an instance of a window (more information can be found here: https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createwindowexa)
     HWND hwnd = CreateWindowEx(
         0, // Window styles
-        Test_Window, // Window class
-        L"Test Window Class", // Window text
+        L"Main Window", // Window class
+        L"Main Application Window", // Window title text
         WS_OVERLAPPEDWINDOW, // Window style
 
         // Size and position
@@ -48,43 +37,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
         NULL, // Parent window
         NULL, // Menu
         hInstance, // Instance handle (???)
-        NULL // Extra application data
+        NULL // Extra application data (can be used to pass a data structure to the window)
     );
+    if(hwnd == NULL) return 0; // If the function fails, it will return 0. If it doesn't it will return a handle for the window to be called
 
-    if(hwnd == NULL) return 0;
+    
+    // Displays the window; hwnd is the window, and nCmdShow is a minimize/maximization of a window (passed by the operating system)
+    ShowWindow(hwnd, nCmdShow); 
 
-    ShowWindow(hwnd, nCmdShow); // Somehow displays the window?
 
-
-    // Run the message loop ?
-
-    MSG msg = {}; // Probably what the window displays
-    while(GetMessage(&msg, NULL, 0, 0)) // Get the message from the window (using its memory address so we can change it in other parts of the program)
+    // Run a message loop, so the window can interact with the user and operating system.
+    MSG msg = {}; 
+    // As long as the message is not 0, the while loop runs true.
+    while(GetMessage(&msg, NULL, 0, 0)) // Get a message from the window queue (which holds the messages for every window created in this program). If there are no messages, WAIT until one is sent.
     {
-        TranslateMessage(&msg); // Translates keystrokes into characters
-        DispatchMessage(&msg); // 
+        // Almost alawys, pass the message structure to these two messages.
+        TranslateMessage(&msg); // Translates keystrokes into characters (don't really need to know how this works)
+        DispatchMessage(&msg); // Tells the operating system to call the window procedure of the window that is the target of the message
     }
 
+    // End of program
     return 0;
-}
-
-// Defines the behavior of the window
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
-    switch(uMsg){ // Message handling to tell the window what to do
-        case WM_DESTROY: // On destroy comand, delete the window
-            PostQuitMessage(0);
-            return 0;
-        
-        case WM_PAINT: // On paint command, draw ? the window
-            {
-                PAINTSTRUCT ps;
-                HDC hdc = BeginPaint(hwnd, &ps);
-
-                FillRect(hdc, &ps.rcPaint, (HBRUSH) (COLOR_WINDOW + 1));
-                EndPaint(hwnd, &ps);
-            }
-            return 0;
-    }
-
-    return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
