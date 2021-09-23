@@ -1,5 +1,6 @@
 #include "Windows.h" // Defines our windows
 
+// https://dev.to/giovannicodes/setup-sdl2-with-visual-studio-code-and-mingw64-on-windows-14c5#:~:text=%20Setup%20SDL2%20with%20Visual%20Studio%20Code%20and,and%20cross%20your%20fingers.%20You%20should...%20More%20
 /* 
 Notes to Run the Program
 https://stackoverflow.com/questions/61570603/can-not-compile-win32-c-using-mingw
